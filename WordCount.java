@@ -22,15 +22,15 @@ public class WordCount {
             String line = value.toString();
             StringTokenizer tokenizer = new StringTokenizer(line);
             boolean is_first_coord = true;
-            word.set('pi');
+            word.set("pi");
             while (tokenizer.hasMoreTokens()) {
                 String symbol = tokenizer.nextToken();
                 if (is_first_coord) {
-                    x = symbol.get().toInt();
+                    x = Integer.parseInt(symbol);
                     is_first_coord = false;
                 }
                 else {
-                    y = symbol.get().toInt();
+                    y = Integer.parseInt(symbol);
                     is_first_coord = true;
                     if (x * x + y * y <= 1) {
                         context.write(word, one);
@@ -46,18 +46,18 @@ public class WordCount {
         public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
             public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
                 int sum1 = 0;
-                int sum2 = 0
+                int sum2 = 0;
                 for (IntWritable val : values) {
                     int value = val.get();
-                    if (value) {
-                        sum += val.get();
+                    if (value == 1) {
+                        sum1 += val.get();
                     }
                     else {
                         sum2 += val.get();
                     }
                 }
                 float pi = sum1 / (sum1 + sum2);
-                context.write(key, new IntWritable(pi));
+                context.write(key, new FloatWritable(pi));
             }
 
         };
