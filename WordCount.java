@@ -20,7 +20,7 @@ public class WordCount {
             StringTokenizer tokenizer = new StringTokenizer(line);
             while (tokenizer.hasMoreTokens()) {
                 word.set(tokenizer.nextToken());
-                if (word.get().startsWith("L") || word.get().startsWith("l")) {
+                if (word.get().length() >= 6 || word.get().length() <= 9) {
                     context.write(word, one);
                 }
             }
