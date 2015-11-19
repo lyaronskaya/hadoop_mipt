@@ -13,15 +13,31 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 public class WordCount {
     public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
         private final static IntWritable one = new IntWritable(1);
+        private final static IntWritable zero = new IntWritable(0);
         private Text word = new Text();
 
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+            int x;
+            int y;
             String line = value.toString();
             StringTokenizer tokenizer = new StringTokenizer(line);
+            boolean is_first_coord = true;
+            word.set('pi');
             while (tokenizer.hasMoreTokens()) {
-                word.set(tokenizer.nextToken());
-                if (word.getLength() >= 6 || word.getLength() <= 9) {
-                    context.write(word, one);
+                String symbol = tokenizer.nextToken();
+                if (is_first_coord) {
+                    x = symbol.get().toInt();
+                    is_first_coord = false;
+                }
+                else {
+                    y = symbol.get().toInt();
+                    is_first_coord = true;
+                    if (x * x + y * y <= 1) {
+                        context.write(word, one);
+                    }
+                    else {
+                        context.write(word, zero);
+                    }
                 }
             }
         }
@@ -29,11 +45,19 @@ public class WordCount {
 
         public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
             public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-                int sum = 0;
+                int sum1 = 0;
+                int sum2 = 0
                 for (IntWritable val : values) {
-                    sum += val.get();
+                    int value = val.get();
+                    if (value) {
+                        sum += val.get();
+                    }
+                    else {
+                        sum2 += val.get();
+                    }
                 }
-                context.write(key, new IntWritable(sum));
+                float pi = sum1 / (sum1 + sum2);
+                context.write(key, new IntWritable(pi));
             }
 
         };
