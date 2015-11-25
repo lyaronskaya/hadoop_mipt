@@ -1,4 +1,4 @@
-package ru.jiht;
+//package ru.jiht;
 import java.io.*;
 import java.util.*;
 import org.apache.hadoop.fs.Path;
@@ -22,7 +22,6 @@ public class WordCount {
             String line = value.toString();
             StringTokenizer tokenizer = new StringTokenizer(line);
             boolean is_first_coord = true;
-            word.set("pi");
             while (tokenizer.hasMoreTokens()) {
                 String symbol = tokenizer.nextToken();
                 if (is_first_coord) {
@@ -32,6 +31,18 @@ public class WordCount {
                 else {
                     y = Integer.parseInt(symbol);
                     is_first_coord = true;
+                    if (x > 0 && y > 0) {
+                        word.set("first");
+                    }
+                    else if (x > 0 && y <= 0) {
+                        word.set("second");
+                    }
+                    else if (x < 0 && y < 0) {
+                        word.set("third");
+                    }
+                    else if (x <= 0 && y >= 0) {
+                        word.set("fourth");
+                    }
                     if (x * x + y * y <= 1) {
                         context.write(word, one);
                     }
@@ -43,24 +54,24 @@ public class WordCount {
         }
     };
 
-        public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
-            public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-                int sum1 = 0;
-                int sum2 = 0;
-                for (IntWritable val : values) {
-                    int value = val.get();
-                    if (value == 1) {
-                        sum1 += val.get();
-                    }
-                    else {
-                        sum2 += val.get();
-                    }
+    public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
+        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+            int sum1 = 0;
+            int sum2 = 0;
+            for (IntWritable val : values) {
+                int value = val.get();
+                if (value == 1) {
+                    sum1 += value;
                 }
-                float pi = sum1 / (sum1 + sum2);
-                context.write(key, new FloatWritable(pi));
+                else {
+                    sum2 += value;
+                }
             }
+            float pi = sum1 / (sum1 + sum2);
+            context.write(key, new TextWritable(String.valueOf(pi)));
+        }
 
-        };
+    };
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         Job job = new Job(conf, "wordcount");
