@@ -1,4 +1,4 @@
-//package ru.jiht;
+package ru.jiht;
 import java.io.*;
 import java.util.*;
 import org.apache.hadoop.fs.Path;
