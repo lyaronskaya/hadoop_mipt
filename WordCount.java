@@ -17,38 +17,29 @@ public class WordCount {
         private Text word = new Text();
 
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            int x;
-            int y;
+            int x = 0;
+            int y = 0;
             String line = value.toString();
             StringTokenizer tokenizer = new StringTokenizer(line);
-            boolean is_first_coord = true;
+            String symbol = tokenizer.nextToken();
+            y = Integer.parseInt(symbol);
             while (tokenizer.hasMoreTokens()) {
-                String symbol = tokenizer.nextToken();
-                if (is_first_coord) {
-                    x = Integer.parseInt(symbol);
-                    is_first_coord = false;
+                x = y;
+                symbol = tokenizer.nextToken();
+                y = Integer.parseInt(symbol);
+                if (x > 0 && y > 0) {
+                    word.set("first");
+                } else if (x > 0 && y <= 0) {
+                    word.set("second");
+                } else if (x < 0 && y < 0) {
+                    word.set("third");
+                } else if (x <= 0 && y >= 0) {
+                    word.set("fourth");
                 }
-                else {
-                    y = Integer.parseInt(symbol);
-                    is_first_coord = true;
-                    if (x > 0 && y > 0) {
-                        word.set("first");
-                    }
-                    else if (x > 0 && y <= 0) {
-                        word.set("second");
-                    }
-                    else if (x < 0 && y < 0) {
-                        word.set("third");
-                    }
-                    else if (x <= 0 && y >= 0) {
-                        word.set("fourth");
-                    }
-                    if (x * x + y * y <= 1) {
-                        context.write(word, one);
-                    }
-                    else {
-                        context.write(word, zero);
-                    }
+                if (x * x + y * y <= 1) {
+                    context.write(word, one);
+                } else {
+                    context.write(word, zero);
                 }
             }
         }
