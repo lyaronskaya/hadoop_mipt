@@ -68,7 +68,9 @@ public class WordCount {
                 }
             }
             float pi = sum1 / (sum1 + sum2);
-            context.write(key, new TextWritable(String.valueOf(pi)));
+            Text curr_pi = new Text();
+            curr_pi.set(String.valueOf(pi));
+            context.write(key, curr_pi);
         }
 
     };
